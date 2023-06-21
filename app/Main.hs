@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Lib
+import LambdaCalculus.REPL ( runREPL )
 
 main :: IO ()
-main = someFunc
+main = runREPL id
