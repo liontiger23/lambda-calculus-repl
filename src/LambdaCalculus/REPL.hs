@@ -15,6 +15,6 @@ runREPL prompt eval =
           runREPL prompt eval   -- loop
   where
     read' =
-      do putStr $ prompt ++ "> "
+      do putStr prompt
          hFlush stdout
          getLine
