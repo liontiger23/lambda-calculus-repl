@@ -1,26 +1,38 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 module LambdaCalculus.Parser
     ( term
+    , parseTerm
     ) where
 
 import LambdaCalculus.Terms
-import Text.Parsec
+import Text.Megaparsec
+import Data.Void
+import Data.Text (Text)
+import qualified Data.Text as T
+import Text.Megaparsec.Char
 
-term :: (Stream s m Char) => ParsecT s u m Term
-term = spaces *> (var <|> app <|> abs')
+type Parser = Parsec Void Text
 
-var :: (Stream s m Char) => ParsecT s u m Term
+parseTerm :: Text -> Either Text Term
+parseTerm = left (T.pack . errorBundlePretty) . runParser term ""
+
+left :: (a -> b) -> Either a c -> Either b c
+left f (Left a)  = Left (f a)
+left _ (Right c) = Right c
+
+term :: Parser Term
+term = space *> (var <|> app <|> abs')
+
+var :: Parser Term
 var = fmap Var ident
 
-app :: (Stream s m Char) => ParsecT s u m Term
-app = between (char '(') (char ')') $
+app :: Parser Term
+app = between (single '(') (single ')') $
     try (App <$> term <*> term) <|>
     try (App <$> var <*> term)
 
 
-abs' :: (Stream s m Char) => ParsecT s u m Term
-abs' = Abs <$> between (char '\\' <* spaces) (spaces *> char '.' <* spaces) ident <*> term
+abs' :: Parser Term
+abs' = Abs <$> between (oneOf ['\\', 'λ'] <* space) (space *> single '.' <* space) ident <*> term
 
-ident :: (Stream s m Char) => ParsecT s u m Ident
-ident = (:) <$> letter <*> many alphaNum
+ident :: Parser Ident
+ident = T.pack <$> ((:) <$> letterChar <*> many alphaNumChar)

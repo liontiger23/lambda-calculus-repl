@@ -21,7 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/lion
 
 dependencies:
 - base >= 4.7 && < 5
-- parsec >= 3
+- megaparsec
+- text
 
 ghc-options:
 - -Wall
@@ -33,6 +34,7 @@ ghc-options:
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
+- -XOverloadedStrings
 
 library:
   source-dirs: src

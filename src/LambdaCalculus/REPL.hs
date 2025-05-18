@@ -4,17 +4,19 @@ module LambdaCalculus.REPL
 
 import System.IO ( hFlush, stdout )
 import Control.Monad (unless)
+import qualified Data.Text.IO as T
+import Data.Text (Text)
 
 -- Runs the Run-Evaluate-Print-Loop with given
 -- evaluation function.
-runREPL :: String -> (String -> String) -> IO ()
+runREPL :: Text -> (Text -> Text) -> IO ()
 runREPL prompt eval =
   do input <- read'             -- read
      unless (input == ":q" || input == ":quit") $
-       do putStrLn (eval input) -- evaluate and print
+       do T.putStrLn (eval input) -- evaluate and print
           runREPL prompt eval   -- loop
   where
     read' =
-      do putStr prompt
+      do T.putStr prompt
          hFlush stdout
-         getLine
+         T.getLine
