@@ -13,7 +13,7 @@ import Text.Megaparsec.Char
 type Parser = Parsec Void Text
 
 parseTerm :: Text -> Either Text Term
-parseTerm = left (T.pack . errorBundlePretty) . runParser term ""
+parseTerm = left (T.pack . errorBundlePretty) . runParser (term <* eof) ""
 
 left :: (a -> b) -> Either a c -> Either b c
 left f (Left a)  = Left (f a)
