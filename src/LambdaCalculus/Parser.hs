@@ -18,19 +18,19 @@ left f (Left a)  = Left (f a)
 left _ (Right c) = Right c
 
 term :: Parser Term
-term = space *> (abs' <|> app <|>var)
+term = label "Term" $ space *> (abs' <|> app <|> var)
 
 var :: Parser Term
-var = fmap Var ident
+var = label "Var" $ fmap Var ident
 
 app :: Parser Term
-app = between (single '(') (single ')') $
+app = label "App" $ between (single '(') (space *> single ')') $
     try (App <$> term <*> term) <|>
     try (App <$> var <*> term)
 
 
 abs' :: Parser Term
-abs' = Abs <$> between ((chunk "\\" <|> chunk "λ") <* space) (space *> single '.' <* space) ident <*> term
+abs' = label "Abs" $ Abs <$> between ((chunk "\\" <|> chunk "λ") <* space) (space *> single '.' <* space) ident <*> term
 
 ident :: Parser Ident
-ident = (:) <$> letterChar <*> many alphaNumChar
+ident = label "Ident" $ (:) <$> letterChar <*> many alphaNumChar

@@ -2,6 +2,7 @@ module TestUtils where
 
 import Test.Tasty.QuickCheck
 import LambdaCalculus.Terms
+import Data.Ord (clamp)
 
 newtype AnyTerm = AnyTerm Term
   deriving Show
@@ -28,3 +29,12 @@ newtype LambdaPrompt = LambdaPrompt String
 
 instance Arbitrary LambdaPrompt where
   arbitrary = LambdaPrompt <$> elements ["λ", "\\"]
+
+newtype Paddings = Paddings [[Char]]
+
+instance Arbitrary Paddings where
+  arbitrary = fmap Paddings $
+    infiniteListOf $
+    scale (clamp (0, 5)) $ listOf $
+    elements [' ']
+
