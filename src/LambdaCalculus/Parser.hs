@@ -5,6 +5,7 @@ module LambdaCalculus.Parser
 
 import LambdaCalculus.Terms
 import Text.Megaparsec
+import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void
 import Text.Megaparsec.Char
 
@@ -21,16 +22,25 @@ term :: Parser Term
 term = label "Term" $ space *> (abs' <|> app <|> var)
 
 var :: Parser Term
-var = label "Var" $ fmap Var ident
+var = label "Var" $ lexeme $ fmap Var ident
 
 app :: Parser Term
-app = label "App" $ between (single '(') (space *> single ')') $
+app = label "App" $ lexeme $ between (lexeme $ single '(') (lexeme $ single ')') $
     try (App <$> term <*> term) <|>
     try (App <$> var <*> term)
 
 
 abs' :: Parser Term
-abs' = label "Abs" $ Abs <$> between ((chunk "\\" <|> chunk "λ") <* space) (space *> single '.' <* space) ident <*> term
+abs' = label "Abs" $ lexeme $ Abs <$> between (lexeme (chunk "\\" <|> chunk "λ")) (lexeme $ single '.') ident <*> term
 
 ident :: Parser Ident
-ident = label "Ident" $ (:) <$> letterChar <*> many alphaNumChar
+ident = label "Ident" $ lexeme $ (:) <$> letterChar <*> many alphaNumChar
+
+skipSpace :: Parser ()
+skipSpace = L.space
+  space1
+  (L.skipLineComment "--")
+  (L.skipBlockCommentNested "{-" "-}")
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme skipSpace
