@@ -7,10 +7,11 @@ import System.Console.Haskeline
 
 import LambdaCalculus.Parser
 import LambdaCalculus.Terms
+import Data.List (intercalate)
 
 repl :: IO ()
 repl = runInputT defaultSettings { historyFile = Just ".lambda-history" } $
-  runREPL "λ> " (either id render . parseTerm)
+  runREPL "λ> " (either id (renderReductions . take 100 . reduceFully) . parseTerm)
 
 -- Runs the Run-Evaluate-Print-Loop with given
 -- evaluation function.
@@ -24,3 +25,6 @@ runREPL prompt eval =
        Just input ->
          do outputStrLn (eval input) -- evaluate and print
             runREPL prompt eval   -- loop
+
+renderReductions :: [Term] -> String
+renderReductions = intercalate "\n~ " . fmap render
