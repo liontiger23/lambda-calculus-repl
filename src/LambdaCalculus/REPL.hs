@@ -11,7 +11,7 @@ import Data.List (intercalate)
 
 repl :: IO ()
 repl = runInputT defaultSettings { historyFile = Just ".lambda-history" } $
-  runREPL "λ> " (either id (renderReductions . take 100 . reduceFully) . parseTerm)
+  runREPL (lambda ++ "> ") (either id (renderReductions . take 100 . reduceFully) . parseTerm)
 
 -- Runs the Run-Evaluate-Print-Loop with given
 -- evaluation function.

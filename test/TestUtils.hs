@@ -28,7 +28,7 @@ newtype LambdaPrompt = LambdaPrompt String
   deriving Show
 
 instance Arbitrary LambdaPrompt where
-  arbitrary = LambdaPrompt <$> elements ["λ", "\\"]
+  arbitrary = LambdaPrompt <$> elements [lambda, "\\"]
 
 newtype Paddings = Paddings [[Char]]
 

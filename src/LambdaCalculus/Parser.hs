@@ -31,7 +31,7 @@ app = label "App" $ lexeme $ between (lexeme $ single '(') (lexeme $ single ')')
 
 
 abs' :: Parser Term
-abs' = label "Abs" $ lexeme $ Abs <$> between (lexeme (chunk "\\" <|> chunk "λ")) (lexeme $ single '.') ident <*> term
+abs' = label "Abs" $ lexeme $ Abs <$> between (lexeme (chunk "\\" <|> chunk lambda)) (lexeme $ single '.') ident <*> term
 
 ident :: Parser Ident
 ident = label "Ident" $ lexeme $ (:) <$> letterChar <*> many alphaNumChar

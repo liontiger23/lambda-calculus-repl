@@ -1,6 +1,7 @@
 module LambdaCalculus.Terms
     ( Term (..)
     , Ident
+    , lambda
     , render
     , render'
     , renderTokens'
@@ -18,7 +19,7 @@ data Term = Var Ident      -- Variable
     deriving (Show, Eq)
 
 render :: Term -> String
-render = render' "λ"
+render = render' lambda
 
 render' :: String -> Term -> String
 render' l = concat . renderTokens' l
@@ -46,3 +47,6 @@ substitute x s (App m n) = App (substitute x s m) (substitute x s n)
 -- Note: when starting from closed terms (with all variables bound)
 -- we don't need to do any renaming
 substitute x s (Abs y m) = Abs y (substitute x s m)
+
+lambda :: String
+lambda = "λ"
