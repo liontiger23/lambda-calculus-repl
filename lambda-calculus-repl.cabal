@@ -37,6 +37,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -XOverloadedStrings
   build-depends:
       base >=4.7 && <5
+    , haskeline
     , megaparsec
     , text
   default-language: Haskell2010
@@ -52,6 +53,7 @@ executable lambda-calculus-repl-exe
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -XOverloadedStrings -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , haskeline
     , lambda-calculus-repl
     , megaparsec
     , text
@@ -69,6 +71,7 @@ test-suite lambda-calculus-repl-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -XOverloadedStrings -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , haskeline
     , lambda-calculus-repl
     , megaparsec
     , text

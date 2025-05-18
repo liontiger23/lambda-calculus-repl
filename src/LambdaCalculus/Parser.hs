@@ -6,14 +6,12 @@ module LambdaCalculus.Parser
 import LambdaCalculus.Terms
 import Text.Megaparsec
 import Data.Void
-import Data.Text (Text)
-import qualified Data.Text as T
 import Text.Megaparsec.Char
 
-type Parser = Parsec Void Text
+type Parser = Parsec Void String
 
-parseTerm :: Text -> Either Text Term
-parseTerm = left (T.pack . errorBundlePretty) . runParser (term <* eof) ""
+parseTerm :: String -> Either String Term
+parseTerm = left errorBundlePretty . runParser (term <* eof) ""
 
 left :: (a -> b) -> Either a c -> Either b c
 left f (Left a)  = Left (f a)
@@ -35,4 +33,4 @@ abs' :: Parser Term
 abs' = Abs <$> between (oneOf ['\\', 'λ'] <* space) (space *> single '.' <* space) ident <*> term
 
 ident :: Parser Ident
-ident = T.pack <$> ((:) <$> letterChar <*> many alphaNumChar)
+ident = (:) <$> letterChar <*> many alphaNumChar

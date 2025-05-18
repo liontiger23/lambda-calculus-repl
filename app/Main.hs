@@ -1,8 +1,6 @@
 module Main (main) where
 
-import LambdaCalculus.REPL ( runREPL )
-import LambdaCalculus.Parser (parseTerm)
-import LambdaCalculus.Terms (render)
+import LambdaCalculus.REPL (repl)
 
 main :: IO ()
-main = runREPL "λ> " (either id render . parseTerm)
+main = repl

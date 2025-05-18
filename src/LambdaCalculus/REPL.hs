@@ -1,22 +1,26 @@
 module LambdaCalculus.REPL
     ( runREPL
+    , repl
     ) where
 
-import System.IO ( hFlush, stdout )
-import Control.Monad (unless)
-import qualified Data.Text.IO as T
-import Data.Text (Text)
+import System.Console.Haskeline
+
+import LambdaCalculus.Parser
+import LambdaCalculus.Terms
+
+repl :: IO ()
+repl = runInputT defaultSettings { historyFile = Just ".lambda-history" } $
+  runREPL "λ> " (either id render . parseTerm)
 
 -- Runs the Run-Evaluate-Print-Loop with given
 -- evaluation function.
-runREPL :: Text -> (Text -> Text) -> IO ()
+runREPL :: String -> (String -> String) -> InputT IO ()
 runREPL prompt eval =
-  do input <- read'             -- read
-     unless (input == ":q" || input == ":quit") $
-       do T.putStrLn (eval input) -- evaluate and print
-          runREPL prompt eval   -- loop
-  where
-    read' =
-      do T.putStr prompt
-         hFlush stdout
-         T.getLine
+  do minput <- getInputLine prompt                 -- read
+     case minput of
+       Nothing -> return ()
+       Just ":q" -> return ()
+       Just ":quit" -> return ()
+       Just input ->
+         do outputStrLn (eval input) -- evaluate and print
+            runREPL prompt eval   -- loop
