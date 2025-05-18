@@ -8,6 +8,7 @@ import Text.Megaparsec
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void
 import Text.Megaparsec.Char
+import Control.Monad.Combinators.Expr
 
 type Parser = Parsec Void String
 
@@ -24,11 +25,13 @@ term = label "Term" $ space *> (abs' <|> app <|> var)
 var :: Parser Term
 var = label "Var" $ lexeme $ fmap Var ident
 
-app :: Parser Term
-app = label "App" $ lexeme $ between (lexeme $ single '(') (lexeme $ single ')') $
-    try (App <$> term <*> term) <|>
-    try (App <$> var <*> term)
+appTerm :: Parser Term
+appTerm = choice [abs', parens app, var]
 
+app :: Parser Term
+app = makeExprParser appTerm
+  [ [ InfixL (App <$ chunk "") ]
+  ]
 
 abs' :: Parser Term
 abs' = label "Abs" $ lexeme $ Abs <$> between (lexeme (chunk "\\" <|> chunk lambda)) (lexeme $ single '.') ident <*> term
@@ -44,3 +47,6 @@ skipSpace = L.space
 
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme skipSpace
+
+parens :: Parser a -> Parser a
+parens = between (lexeme $ single '(') (lexeme $ single ')')

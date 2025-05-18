@@ -26,8 +26,19 @@ render' l = concat . renderTokens' l
 
 renderTokens' :: String -> Term -> [String]
 renderTokens' _ (Var x) = [x]
-renderTokens' l (App m n) = ["("] ++ renderTokens' l m ++ [" "] ++ renderTokens' l n ++ [")"]
+renderTokens' l (App m n) = renderAppLeft' l m ++ [" "] ++ renderAppRight' l n
 renderTokens' l (Abs x m) = [l, x, "."] ++ renderTokens' l m
+
+renderAppLeft' :: String -> Term -> [String]
+renderAppLeft' l m@(Abs _ _) = parens (renderTokens' l m)
+renderAppLeft' l m = renderTokens' l m
+renderAppRight' :: String -> Term -> [String]
+renderAppRight' l m@(Abs _ _) = parens (renderTokens' l m)
+renderAppRight' l m@(App _ _) = parens (renderTokens' l m)
+renderAppRight' l m = renderTokens' l m
+
+parens :: [String] -> [String]
+parens xs = ["("] ++ xs ++ [")"]
 
 reduceFully :: Term -> [Term]
 reduceFully t = case reduce t of

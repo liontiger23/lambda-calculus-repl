@@ -22,8 +22,12 @@ description:         Please see the README on GitHub at <https://github.com/lion
 dependencies:
 - base >= 4.7 && < 5
 - megaparsec
+- parser-combinators
 - text
 - haskeline
+
+default-extensions:
+- OverloadedStrings
 
 ghc-options:
 - -Wall
@@ -35,7 +39,6 @@ ghc-options:
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
-- -XOverloadedStrings
 
 library:
   source-dirs: src
