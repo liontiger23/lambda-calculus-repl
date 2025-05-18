@@ -61,3 +61,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - lambda-calculus-repl
+    - tasty
+    - tasty-hunit
+    - tasty-quickcheck

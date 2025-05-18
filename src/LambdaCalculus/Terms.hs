@@ -2,6 +2,8 @@ module LambdaCalculus.Terms
     ( Term (..)
     , Ident
     , render
+    , render'
+    , renderTokens'
     ) where
 
 type Ident = String
@@ -12,7 +14,13 @@ data Term = Var Ident      -- Variable
     deriving (Show, Eq)
 
 render :: Term -> String
-render (Var x) = x
-render (App m n) = "(" <> render m <> " " <> render n <> ")"
-render (Abs x m) = "λ" <> x <> "." <> render m
+render = render' "λ"
+
+render' :: String -> Term -> String
+render' l = concat . renderTokens' l
+
+renderTokens' :: String -> Term -> [String]
+renderTokens' _ (Var x) = [x]
+renderTokens' l (App m n) = ["("] ++ renderTokens' l m ++ [" "] ++ renderTokens' l n ++ [")"]
+renderTokens' l (Abs x m) = [l, x, "."] ++ renderTokens' l m
 

@@ -18,7 +18,7 @@ left f (Left a)  = Left (f a)
 left _ (Right c) = Right c
 
 term :: Parser Term
-term = space *> (var <|> app <|> abs')
+term = space *> (abs' <|> app <|>var)
 
 var :: Parser Term
 var = fmap Var ident
@@ -30,7 +30,7 @@ app = between (single '(') (single ')') $
 
 
 abs' :: Parser Term
-abs' = Abs <$> between (oneOf ['\\', 'λ'] <* space) (space *> single '.' <* space) ident <*> term
+abs' = Abs <$> between ((chunk "\\" <|> chunk "λ") <* space) (space *> single '.' <* space) ident <*> term
 
 ident :: Parser Ident
 ident = (:) <$> letterChar <*> many alphaNumChar
