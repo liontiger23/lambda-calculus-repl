@@ -1,6 +1,6 @@
 module Main (main) where
 
-import LambdaCalculus.REPL (repl)
+import LambdaCalculus.REPL (replMain)
 
 main :: IO ()
-main = repl
+main = replMain
