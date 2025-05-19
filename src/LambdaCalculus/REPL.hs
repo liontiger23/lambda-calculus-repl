@@ -27,4 +27,4 @@ runREPL prompt eval =
             runREPL prompt eval   -- loop
 
 renderReductions :: [Term] -> String
-renderReductions = intercalate "\n~ " . fmap render
+renderReductions = ("~ " ++) . intercalate "\n~ " . fmap render
