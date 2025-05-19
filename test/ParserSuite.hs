@@ -58,6 +58,14 @@ samples =
      App (Var "x") (Var "y"))
   , ("(x (y))",
      App (Var "x") (Var "y"))
+  , ("(x(y))",
+     App (Var "x") (Var "y"))
+  , ("((x) y)",
+     App (Var "x") (Var "y"))
+  , ("((x)y)",
+     App (Var "x") (Var "y"))
+  , ("((x)(y))",
+     App (Var "x") (Var "y"))
 
   , ("x y z",
      App (App (Var "x") (Var "y")) (Var "z"))
