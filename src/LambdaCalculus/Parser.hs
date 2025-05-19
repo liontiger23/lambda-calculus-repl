@@ -37,7 +37,7 @@ abs' :: Parser Term
 abs' = label "Abs" $ lexeme $ Abs <$> between (lexeme (chunk "\\" <|> chunk lambda)) (lexeme $ single '.') ident <*> term
 
 ident :: Parser Ident
-ident = label "Ident" $ lexeme $ (:) <$> letterChar <*> many alphaNumChar
+ident = label "Ident" $ lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> single '\'')
 
 skipSpace :: Parser ()
 skipSpace = L.space

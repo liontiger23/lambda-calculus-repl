@@ -83,6 +83,13 @@ samples =
      Abs "x" (App (Var "x") (Var "x")))
   , ("(" ++ lambda ++ "x.x x" ++ ") (" ++ lambda ++ "x.x x" ++ ")",
      App (Abs "x" (App (Var "x") (Var "x"))) (Abs "x" (App (Var "x") (Var "x"))))
+  ] ++
+  [ ("x'",
+     Var "x'")
+  , ("x''",
+     Var "x''")
+  , (lambda ++ "x'.x'",
+     Abs "x'" (Var "x'"))
   ]
 
 
