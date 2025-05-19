@@ -7,15 +7,15 @@ import System.Console.Haskeline
 
 import LambdaCalculus.Parser
 import LambdaCalculus.Terms
-import Data.List (intercalate)
+import Data.Foldable (traverse_)
 
 repl :: IO ()
 repl = runInputT defaultSettings { historyFile = Just ".lambda-history" } $
-  runREPL (lambda ++ "> ") (either id (renderReductions . take 100 . reduceFully) . parseTerm)
+  runREPL (lambda ++ "> ") evalTerm
 
 -- Runs the Run-Evaluate-Print-Loop with given
 -- evaluation function.
-runREPL :: String -> (String -> String) -> InputT IO ()
+runREPL :: String -> (String -> [String]) -> InputT IO ()
 runREPL prompt eval =
   do minput <- getInputLine prompt                 -- read
      case minput of
@@ -23,8 +23,11 @@ runREPL prompt eval =
        Just ":q" -> return ()
        Just ":quit" -> return ()
        Just input ->
-         do outputStrLn (eval input) -- evaluate and print
+         do traverse_ outputStrLn (eval input) -- evaluate and print
             runREPL prompt eval   -- loop
 
-renderReductions :: [Term] -> String
-renderReductions = ("~ " ++) . intercalate "\n~ " . fmap render
+evalTerm :: String -> [String]
+evalTerm = either pure (reduceTerm "~ " 100) . parseTerm
+
+reduceTerm :: String -> Int -> Term -> [String]
+reduceTerm sep n = fmap ((sep ++) . render) . take n . reduceFully
