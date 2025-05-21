@@ -1,4 +1,4 @@
-cabal-version: 2.2
+cabal-version: 1.12
 
 -- This file has been generated from package.yaml by hpack version 0.36.0.
 --
@@ -11,13 +11,12 @@ homepage:       https://github.com/liontiger23/lambda-calculus-repl#readme
 bug-reports:    https://github.com/liontiger23/lambda-calculus-repl/issues
 author:         Ivan Trepakov
 maintainer:     liontiger23@gmail.com
-copyright:      Copyright (c) 2024 Ivan Trepakov
-license:        BSD-3-Clause
+copyright:      Copyright (c) 2025 Ivan Trepakov
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    CHANGELOG.md
 
 source-repository head
   type: git
@@ -29,8 +28,6 @@ library
       LambdaCalculus.REPL
       LambdaCalculus.Terms
   other-modules:
-      Paths_lambda_calculus_repl
-  autogen-modules:
       Paths_lambda_calculus_repl
   hs-source-dirs:
       src
@@ -49,8 +46,6 @@ library
 executable lambda-calculus-repl-exe
   main-is: Main.hs
   other-modules:
-      Paths_lambda_calculus_repl
-  autogen-modules:
       Paths_lambda_calculus_repl
   hs-source-dirs:
       app
@@ -73,8 +68,6 @@ test-suite lambda-calculus-repl-test
   other-modules:
       ParserSuite
       TestUtils
-      Paths_lambda_calculus_repl
-  autogen-modules:
       Paths_lambda_calculus_repl
   hs-source-dirs:
       test

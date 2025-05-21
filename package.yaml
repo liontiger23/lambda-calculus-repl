@@ -1,14 +1,13 @@
 name:                lambda-calculus-repl
 version:             0.1.0.0
 github:              "liontiger23/lambda-calculus-repl"
-license:             BSD-3-Clause
+license:             MIT
 author:              "Ivan Trepakov"
 maintainer:          "liontiger23@gmail.com"
-copyright:           "Copyright (c) 2024 Ivan Trepakov"
+copyright:           "Copyright (c) 2025 Ivan Trepakov"
 
 extra-source-files:
 - README.md
-- CHANGELOG.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
