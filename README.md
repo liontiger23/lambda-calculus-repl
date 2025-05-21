@@ -2,7 +2,7 @@
 
 Read-Evaluate-Print-Loop for lambda calculus terms.
 
-Entered terms are immediately evaluated using *normal order $\beta$-reduction*
+Entered terms are immediately evaluated using *normal order reduction*
 (limited to 100 reduction steps).
 Previously entered terms are remembered in `.lambda-history` with usual
 command-line history support out-of-the-box.
