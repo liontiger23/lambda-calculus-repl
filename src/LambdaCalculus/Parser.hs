@@ -1,6 +1,7 @@
 module LambdaCalculus.Parser
     ( term
     , parseTerm
+    , parseTermDef
     ) where
 
 import LambdaCalculus.Terms
@@ -14,6 +15,9 @@ type Parser = Parsec Void String
 
 parseTerm :: String -> Either String Term
 parseTerm = left errorBundlePretty . runParser (term <* eof) ""
+
+parseTermDef :: String -> Either String (Ident, Term)
+parseTermDef = left errorBundlePretty . runParser ((,) <$> ident <* lexeme (single '=') <*> term <* eof) ""
 
 left :: (a -> b) -> Either a c -> Either b c
 left f (Left a)  = Left (f a)
