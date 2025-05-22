@@ -35,7 +35,7 @@ repl prompt =
   command :: String -> REPL ()
   command "q" = pure ()
   command "quit" = pure ()
-  command "show" = printDefs *> repl prompt
+  command "defs" = printDefs *> repl prompt
   command cmd = (case break isSpace cmd of
       ("save", name) -> writeDefs (trim name)
       ("load", name) -> readDefs (trim name)
