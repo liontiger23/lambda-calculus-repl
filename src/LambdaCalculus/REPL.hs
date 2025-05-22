@@ -65,9 +65,7 @@ process input
 definition :: String -> REPL ()
 definition input = case parseTermDef input of
   Left err -> lift $ outputStrLn err
-  Right (n, t) -> do
-    t' <- unwrap t
-    modify (M.insert n t')
+  Right (n, t) -> modify (M.insert n t)
 
 unwrap :: Term -> REPL Term
 unwrap t = do
