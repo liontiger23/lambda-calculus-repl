@@ -57,7 +57,9 @@ substitute x s (Var y) | x == y    = s
 substitute x s (App m n) = App (substitute x s m) (substitute x s n)
 -- Note: when starting from closed terms (with all variables bound)
 -- we don't need to do any renaming
-substitute x s (Abs y m) = Abs y (substitute x s m)
+substitute x s (Abs y m) 
+  | x /= y    = Abs y (substitute x s m)
+  | otherwise = Abs y m
 
 lambda :: String
 lambda = "λ"

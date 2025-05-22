@@ -46,13 +46,22 @@ process input
 definition :: String -> REPL ()
 definition input = case parseTermDef input of
   Left err -> lift $ outputStrLn err
-  Right (n, t) -> modify (M.insert n t)
+  Right (n, t) -> do
+    t' <- unwrap t
+    modify (M.insert n t')
+
+unwrap :: Term -> REPL Term
+unwrap t = do
+  subs <- gets M.assocs
+  let t' = foldr (uncurry substitute) t subs
+  if t' == t then pure t else unwrap t'
 
 eval :: String -> REPL ()
-eval input = lift $ traverse_ outputStrLn (evalTerm input)
-
-evalTerm :: String -> [String]
-evalTerm = either pure (reduceTerm "~ " 100) . parseTerm
+eval input = case parseTerm input of
+  Left err -> lift $ outputStrLn err
+  Right t  -> do
+    t' <- unwrap t
+    lift $ traverse_ outputStrLn (reduceTerm "~ " 100 t')
 
 reduceTerm :: String -> Int -> Term -> [String]
 reduceTerm sep n = fmap ((sep ++) . render) . take n . reduceFully
