@@ -10,6 +10,8 @@ import Data.Foldable (traverse_)
 import Control.Monad.State
 import qualified Data.Map as M
 import Data.Map (Map)
+import Data.Char (isSpace)
+import Control.Exception (IOException, try)
 
 type REPL = StateT (Map Ident Term) (InputT IO)
 
@@ -27,16 +29,33 @@ repl prompt =
   do minput <- lift $ getInputLine prompt
      case minput of
        Nothing -> pure ()
-       Just ":q" -> pure ()
-       Just ":quit" -> pure ()
-       Just ":show" -> printDefs *> repl prompt
+       Just (':' : cmd) -> command cmd
        Just input   -> process input *> repl prompt
+ where
+  command :: String -> REPL ()
+  command "q" = pure ()
+  command "quit" = pure ()
+  command "show" = printDefs *> repl prompt
+  command cmd = (case break isSpace cmd of
+      ("save", name) -> writeDefs (trim name)
+      ("load", name) -> readDefs (trim name)
+      _              -> lift $ outputStrLn ("Unknown command: " ++ cmd)
+    ) *> repl prompt
 
 printDefs :: REPL ()
-printDefs = do
-  defs <- get
-  lift $ forM_ (M.assocs defs) $ \(k, v) ->
-    outputStrLn $ k ++ " = " ++ render v
+printDefs = showDefs >>= lift . traverse_ outputStrLn
+
+writeDefs :: FilePath -> REPL ()
+writeDefs name = showDefs >>= writeFileLines name
+
+readDefs :: FilePath -> REPL ()
+readDefs name = readFileLines name >>= traverse_ definition
+
+showDefs :: REPL [String]
+showDefs = gets (fmap showDef . M.assocs)
+
+showDef :: (Ident, Term) -> String
+showDef (n, t) = n ++ " = " ++ render t
 
 process :: String -> REPL ()
 process input
@@ -65,3 +84,25 @@ eval input = case parseTerm input of
 
 reduceTerm :: String -> Int -> Term -> [String]
 reduceTerm sep n = fmap ((sep ++) . render) . take n . reduceFully
+
+-- * Utility
+
+trim :: String -> String
+trim = f . f
+   where f = reverse . dropWhile isSpace
+
+readFileLines :: FilePath -> REPL [String]
+readFileLines name = do
+  res <- lift $ lift $ try (readFile name)
+  case res of
+    Left e -> do
+      lift $ outputStrLn $ show (e :: IOException)
+      pure []
+    Right s -> pure $ lines s
+  
+writeFileLines :: FilePath -> [String] -> REPL ()
+writeFileLines name ls = do
+  res <- lift $ lift $ try (writeFile name (unlines ls))
+  case res of
+    Left e -> lift $ outputStrLn $ show (e :: IOException)
+    Right _ -> pure ()
