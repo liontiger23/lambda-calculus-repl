@@ -31,7 +31,7 @@ statement ::= expr | def | ws statement ws
 expr ::= term
 def ::= ident ws "=" ws term
 
-term ::= var | term ws term | lambda ws varName ws "." ws term | (ws term ws) | ws term ws
+term ::= var | term ws term | lambda (ws varName ws)+ "." ws term | (ws term ws) | ws term ws
 
 lambda ::= "\" | "λ"
 var ::= ident

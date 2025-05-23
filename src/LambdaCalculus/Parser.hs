@@ -10,6 +10,7 @@ import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void
 import Text.Megaparsec.Char
 import Control.Monad.Combinators.Expr
+import Data.Monoid (Endo(..))
 
 type Parser = Parsec Void String
 
@@ -44,7 +45,11 @@ app = makeExprParser appTerm
   ]
 
 abs' :: Parser Term
-abs' = label "Abs" $ lexeme $ Abs <$> between (lexeme (chunk "\\" <|> chunk lambda)) (lexeme $ single '.') varName <*> term
+abs' = label "Abs" $ lexeme $
+  between (lexeme (chunk "\\" <|> chunk lambda)) (lexeme $ single '.')
+    -- TODO: write tests for \x y z.x cases
+    (appEndo . mconcat . fmap Endo <$> some (Abs <$> lexeme varName))
+  <*> term
 
 ident :: Parser Ident
 ident = label "Ident" $ lexeme $ (:) <$> alphaNumChar <*> many identChar
