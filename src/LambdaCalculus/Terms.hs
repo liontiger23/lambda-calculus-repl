@@ -1,6 +1,7 @@
 module LambdaCalculus.Terms
     ( Term (..)
     , Ident
+    , VarName
     , lambda
     , render
     , render'
@@ -12,10 +13,11 @@ module LambdaCalculus.Terms
 import Control.Applicative ((<|>))
 
 type Ident = String
+type VarName = String
 
-data Term = Var Ident      -- Variable
-          | App Term Term  -- Application
-          | Abs Ident Term -- Abstraction
+data Term = Var Ident        -- Variable
+          | App Term Term    -- Application
+          | Abs VarName Term -- Abstraction
     deriving (Show, Eq)
 
 render :: Term -> String

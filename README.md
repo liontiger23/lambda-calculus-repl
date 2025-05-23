@@ -26,14 +26,23 @@ To exit REPL enter `:q` or `:quit`.
 ## Syntax
 
 ```haskell
-term ::= var | term term | lambda ident "." term | (term)
+statement ::= expr | def | ws statement ws 
+
+expr ::= term
+def ::= ident ws "=" ws term
+
+term ::= var | term ws term | lambda ws varName ws "." ws term | (ws term ws) | ws term ws
 
 lambda ::= "\" | "λ"
 var ::= ident
-ident ::= letter (alphaNum | "'")+
+ident ::= alphaNum (alphaNum | "'")*
+varName ::= letter (alphaNum | "'")*
 
 letter ::= "a"-"z" | "A"-"Z"
 alphaNum ::= letter | "0"-"9"
+
+ws ::= "" | space ws
+space ::= " " | "\t"
 ```
 
 With usual notation conventions:
