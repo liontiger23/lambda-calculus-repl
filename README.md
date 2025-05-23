@@ -51,7 +51,7 @@ With usual notation conventions:
   `a b c = (a b) c`
 - Abstraction is right associative  
   `\x.\y.x = \x.(\y.x)`
-- Consecutive abstractions can be combined (*not supported yet*)  
+- Consecutive abstractions can be combined  
   `\x.\y.x = \x y.x`
 
 ### Comments
