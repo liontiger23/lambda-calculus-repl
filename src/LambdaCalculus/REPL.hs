@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module LambdaCalculus.REPL
     ( replMain
     ) where
@@ -31,7 +33,7 @@ type REPL = StateT REPLOptions (InputT IO)
 
 replMain :: IO ()
 replMain = runREPL $
-  repl (lambda ++ "> ")
+  repl (lambda <> "> ")
 
 runREPL :: REPL a -> IO a
 runREPL r = runInputT defaultSettings { historyFile = Just ".lambda-history" } $
@@ -40,11 +42,11 @@ runREPL r = runInputT defaultSettings { historyFile = Just ".lambda-history" } $
 -- Runs the Run-Evaluate-Print-Loop
 repl :: String -> REPL ()
 repl prompt =
-  do minput <- lift $ getInputLine prompt
-     case minput of
-       Nothing -> pure ()
-       Just (':' : cmd) -> command cmd
-       Just input   -> process input *> repl prompt
+  lift (getInputLine prompt)
+  >>= \case
+    Nothing -> pure ()
+    Just (':' : cmd) -> command cmd
+    Just input   -> process input *> repl prompt
  where
   command :: String -> REPL ()
   command "q" = pure ()
@@ -56,8 +58,8 @@ repl prompt =
       ("load", name) -> readDefs (trim name)
       ("depth", dep) -> case readMaybe dep of
         Just d -> putDepth d *> printDepth
-        Nothing -> lift $ outputStrLn ("Unexpected depth value: '" <> dep <> "'")
-      _              -> lift $ outputStrLn ("Unknown command: " ++ cmd)
+        Nothing -> printLn ("Unexpected depth value: '" <> dep <> "'")
+      _              -> printLn ("Unknown command: " <> cmd)
     ) *> repl prompt
 
 getDepth :: REPL Int
@@ -73,10 +75,10 @@ modifyDefs :: (Defs -> Defs) -> REPL ()
 modifyDefs f = modify (\o -> o { replDefs = f (replDefs o) })
 
 printDepth :: REPL ()
-printDepth = getDepth >>= lift . outputStrLn . show
+printDepth = getDepth >>= printLn . show
 
 printDefs :: REPL ()
-printDefs = showDefs >>= lift . traverse_ outputStrLn
+printDefs = showDefs >>= traverse_ printLn
 
 writeDefs :: FilePath -> REPL ()
 writeDefs name = showDefs >>= writeFileLines name
@@ -88,7 +90,7 @@ showDefs :: REPL [String]
 showDefs = fmap showDef . M.assocs <$> getDefs
 
 showDef :: (Ident, Term) -> String
-showDef (n, t) = n ++ " = " ++ render t
+showDef (n, t) = n <> " = " <> render t
 
 process :: String -> REPL ()
 process input
@@ -97,7 +99,7 @@ process input
 
 definition :: String -> REPL ()
 definition input = case parseTermDef input of
-  Left err -> lift $ outputStrLn err
+  Left err -> printLn err
   Right (n, t) -> modifyDefs (M.insert n t)
 
 unwrap :: Term -> REPL Term
@@ -108,33 +110,36 @@ unwrap t = do
 
 eval :: String -> REPL ()
 eval input = case parseTerm input of
-  Left err -> lift $ outputStrLn err
+  Left err -> printLn err
   Right t  -> do
     d <- getDepth
     t' <- unwrap t
-    lift $ traverse_ outputStrLn (reduceTerm "~ " d t')
+    traverse_ printLn (reduceTerm "~ " d t')
 
 reduceTerm :: String -> Int -> Term -> [String]
-reduceTerm sep n = fmap ((sep ++) . render) . take n . reduceFully
+reduceTerm sep n = fmap ((sep <>) . render) . take n . reduceFully
 
 -- * Utility
 
 trim :: String -> String
 trim = f . f
-   where f = reverse . dropWhile isSpace
+  where f = reverse . dropWhile isSpace
+
+printLn :: String -> REPL ()
+printLn = lift . outputStrLn
 
 readFileLines :: FilePath -> REPL [String]
-readFileLines name = do
-  res <- lift $ lift $ try (readFile name)
-  case res of
+readFileLines name =
+  liftIO (try (readFile name))
+  >>= \case
     Left e -> do
-      lift $ outputStrLn $ show (e :: IOException)
+      printLn $ show (e :: IOException)
       pure []
     Right s -> pure $ lines s
-  
+
 writeFileLines :: FilePath -> [String] -> REPL ()
-writeFileLines name ls = do
-  res <- lift $ lift $ try (writeFile name (unlines ls))
-  case res of
-    Left e -> lift $ outputStrLn $ show (e :: IOException)
+writeFileLines name ls =
+  liftIO (try (writeFile name (unlines ls)))
+  >>= \case
+    Left e -> printLn $ show (e :: IOException)
     Right _ -> pure ()
